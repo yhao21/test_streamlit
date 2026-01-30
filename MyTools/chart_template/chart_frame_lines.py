@@ -1301,9 +1301,6 @@ class line_frame():
 
         # Use configure_view to change color and size of the chart border.
         #chart = (chart & bar).configure_view(stroke = 'grey', strokeWidth = .2)
-        chart = alt.vconcat(chart, bar).resolve_scale(
-                x = 'shared'
-                ).configure_view(stroke = 'grey', strokeWidth = .2)
 
         return chart
     
