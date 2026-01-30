@@ -1,0 +1,10 @@
+{
+		"chart":{
+				"WHratio":"16:7",
+				"chart_width":1600
+		},
+		"table":{
+				"font-size":20,
+				"text-align":"right"
+		}
+}

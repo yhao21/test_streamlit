@@ -1,59 +1,55 @@
-import streamlit as st
+import json, os
 import altair as alt
-
-import os
-import pandas as pd
+import streamlit as st
 
 
+
+
+alt.renderers.enable('png')
+
+# ~~~~~~~~~~~~~~~~~~~~~~~
+# Set path
+# ~~~~~~~~~~~~~~~~~~~~~~~
+current_dir = os.getcwd()
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~
+# Set Page Layout
+# ~~~~~~~~~~~~~~~~~~~~~~~
 st.set_page_config(layout = 'wide')
 
-df = pd.read_csv('./RGDP-BEA-A.csv')
-print(df)
 
-col_selected = df.columns.to_list()[1:3]
-
-
-
-
-
-
-selector = alt.selection_point(
-        nearest = True,
-        on = 'pointerover',
-        clear = 'pointerout',
-        empty = False
-        )
+# ~~~~~~~~~~~~~~~~~~~~~~~
+# Initialize pages
+# ~~~~~~~~~~~~~~~~~~~~~~~
+###------Load page info------###
+# Note, you MUST make sure that the name of python page files is consistent with the key in page_info.json.
+# For example, key for the first topic is gdp, then you much name the python page file as index_<key>_.py
+with open(os.path.join(current_dir, 'config', 'page_info.json')) as f:
+    page_data = json.load(f)
 
 
+###------Init page------###
+topics = []
+for name, page_info in page_data.items():
+    default = True if name == 'home' else False
 
-bar_selector = alt.selection_interval(encodings = ['x'])
-
-rule = alt.Chart(df).mark_rule(color = 'grey').encode(
-        x = 'Time:N',
-        y2 = alt.value('height'),
-        opacity = alt.condition(selector, alt.value(1), alt.value(0))
-        ).add_params(selector).transform_filter(bar_selector)
-
-
-
-lines = alt.Chart(df).transform_fold(col_selected).mark_line().encode(
-        x = alt.X('Time:N').scale(zero = False),
-        y = alt.Y('value:Q').scale(zero = False),
-        color = 'key:N'
-        ).transform_filter(bar_selector)
+    page_name = f'{name}.py'
+    one_page = st.Page(
+            page = os.path.join(current_dir, 'pages', page_name),
+            title = page_info['title'],
+            url_path = page_info['url_path'],
+            default = default
+            )
+    topics.append(one_page)
 
 
-bar = alt.Chart(df).mark_bar(color = 'grey').encode(
-        x = alt.X('Time:N'),
-        y = alt.value(1),
-        opacity = alt.value(0)
-        ).add_params(bar_selector)
-
-
-
-
-chart = alt.layer(rule, lines)
-chart = (chart & bar)
+###------Organize pages on the sidebar------###
+pages = {
+        "Menu":topics
+        }
+pg = st.navigation(pages, position = 'top')
+pg.run()
 
 
 
@@ -64,4 +60,10 @@ chart = (chart & bar)
 
 
 
-st.altair_chart(chart, width = 'stretch')
+
+
+
+
+
+
+
