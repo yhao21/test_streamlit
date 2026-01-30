@@ -1279,13 +1279,13 @@ class line_frame():
                 )
 
         ###------Recession periods------###
-#        df_recession = self.get_recession_indicator_try(df)
-#        recession_periods = alt.Chart(df_recession).mark_rect(stroke = None).encode(
-#                x = 'Time:N',
-#                opacity = alt.value(st.session_state[self.state_name_recession_opacity]),
-#                color = alt.value(st.session_state[self.state_name_recession_color])
-#                ).transform_filter(bar_selector)
-#
+        df_recession = self.get_recession_indicator_try(df)
+        recession_periods = alt.Chart(df_recession).mark_rect(stroke = None).encode(
+                x = 'Time:N',
+                opacity = alt.value(st.session_state[self.state_name_recession_opacity]),
+                color = alt.value(st.session_state[self.state_name_recession_color])
+                ).transform_filter(bar_selector)
+
 
     
         ###------Merge chart items------###
@@ -1295,12 +1295,15 @@ class line_frame():
         if st.session_state[self.state_name_zero_line]:
             chart = alt.layer(chart, zero_mark)
         # Show recession periods if triggered.
-#        if st.session_state[self.state_name_show_recession]:
-#            chart = alt.layer(chart, recession_periods)
+        if st.session_state[self.state_name_show_recession]:
+            chart = alt.layer(chart, recession_periods)
     
 
         # Use configure_view to change color and size of the chart border.
-        chart = (chart & bar).configure_view(stroke = 'grey', strokeWidth = .2)
+        #chart = (chart & bar).configure_view(stroke = 'grey', strokeWidth = .2)
+        chart = alt.vconcat(chart, bar).resolve_scale(
+                x = 'shared'
+                ).configure_view(stroke = 'grey', strokeWidth = .2)
 
         return chart
     
